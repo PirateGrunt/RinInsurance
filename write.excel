@@ -1,0 +1,24 @@
+load("./data/smMulti.rda")
+load("./data/scmMulti.rda")
+triWC = Triangle(smWC, scmWC, "Workers Comp Triangle")
+
+df = LongToWide(triWC)
+write.excel(triWC, "someFile.xlsx", TRUE)
+write.excel(triWC, "someFile2.xlsx", TRUE, Wide=FALSE)
+
+PaidCLPooled = TriangleModel(UpperTriangle(triWC)
+                             , Response = "IncrementalPaid"
+                             , Predictor = "PriorCumulativePaid"
+                             , ModelType = "pooled")
+
+df = as.data.frame(PaidCLPooled)
+mdf = melt(PaidCLPooled)
+
+write.excel(PaidCLPooled, "model.xlsx", TRUE)
+
+projPaidCLPooled = 
+  TriangleProjection(PaidCLPooled
+                     , AsOfDate=as.Date("2006-12-31")
+                     , MaxLag=10)
+
+write.excel(projPaidCLPooled, "projection.xlsx", TRUE)
